@@ -1,4 +1,4 @@
-package com.webflux.webfluxlearning.sec03;
+package com.webflux.webfluxlearning.sec04;
 
 /*
  * Copyright (c) 2026 Ramjee Prasad
@@ -32,7 +32,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import java.util.Objects;
 
 @AutoConfigureWebTestClient
-@SpringBootTest(properties = "sec=sec03")
+@SpringBootTest(properties = "sec=sec04")
 public class CustomerServiceTest {
 
     private static final Logger log = LoggerFactory.getLogger(CustomerServiceTest.class);
@@ -97,7 +97,7 @@ public class CustomerServiceTest {
                 .consumeWith(r -> log.info("{}", new String(Objects.requireNonNull(r.getResponseBody()))))
                 .jsonPath("$.id").isEqualTo(11)
                 .jsonPath("$.name").isEqualTo("Ashish")
-                .jsonPath("$.email").isEqualTo("ashish2gmail.com");
+                .jsonPath("$.email").isEqualTo("ashish@gmail.com");
 
         this.client.delete()
                 .uri("/customers/11")
@@ -129,12 +129,14 @@ public class CustomerServiceTest {
                 .uri("/customers/11")
                 .exchange()
                 .expectStatus().is4xxClientError()
-                .expectBody().isEmpty();
+                .expectBody()
+                .jsonPath("$.detail").isEqualTo("Customer [id=11] is not found");
         this.client.delete()
                 .uri("/customers/11")
                 .exchange()
                 .expectStatus().is4xxClientError()
-                .expectBody().isEmpty();
+                .expectBody()
+                .jsonPath("$.detail").isEqualTo("Customer [id=11] is not found");
         CustomerDto customer = CustomerDto.builder()
                 .name("Ashish")
                 .email("ashish@gmail.com").build();
@@ -143,6 +145,44 @@ public class CustomerServiceTest {
                 .bodyValue(customer)
                 .exchange()
                 .expectStatus().is4xxClientError()
-                .expectBody().isEmpty();
+                .expectBody()
+                .jsonPath("$.detail").isEqualTo("Customer [id=11] is not found");
     }
+
+    @Test
+    public void invalidInputTest() {
+        CustomerDto missingName = CustomerDto.builder()
+                .name(null)
+                .email("ashish@gmail.com").build();
+        this.client.post()
+                .uri("/customers")
+                .bodyValue(missingName)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody()
+                .jsonPath("$.detail").isEqualTo("Name is required");
+
+        CustomerDto missingEmail = CustomerDto.builder()
+                .name("Ashish")
+                .email(null).build();
+        this.client.post()
+                .uri("/customers")
+                .bodyValue(missingEmail)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody()
+                .jsonPath("$.detail").isEqualTo("Valid email is required");
+
+        CustomerDto invalidEmail = CustomerDto.builder()
+                .name("Ashish")
+                .email("ashishgmail.com").build();
+        this.client.put()
+                .uri("/customers/10")
+                .bodyValue(invalidEmail)
+                .exchange()
+                .expectStatus().is4xxClientError()
+                .expectBody()
+                .jsonPath("$.detail").isEqualTo("Valid email is required");
+    }
+
 }
