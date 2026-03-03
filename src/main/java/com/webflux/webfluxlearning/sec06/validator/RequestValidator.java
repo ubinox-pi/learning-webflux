@@ -1,12 +1,12 @@
-package com.webflux.webfluxlearning.sec04.validator;
+package com.webflux.webfluxlearning.sec06.validator;
 
-import com.webflux.webfluxlearning.sec04.dto.CustomerDto;
-import com.webflux.webfluxlearning.sec04.exceptions.ApplicationExceptions;
+import com.webflux.webfluxlearning.sec06.dto.CustomerDto;
+import com.webflux.webfluxlearning.sec06.exceptions.ApplicationExceptions;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.UnaryOperator;
 
 /*
  * Copyright (c) 2026 Ramjee Prasad
@@ -28,7 +28,7 @@ import java.util.function.UnaryOperator;
  */
 public class RequestValidator {
 
-    public static UnaryOperator<Mono<CustomerDto>> validate() {
+    public static Function<Mono<CustomerDto>, Mono<CustomerDto>> validate() {
         return mono -> mono
                 .filter(hasName())
                 .switchIfEmpty(ApplicationExceptions.missionName())
