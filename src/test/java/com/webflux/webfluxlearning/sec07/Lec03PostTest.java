@@ -1,5 +1,13 @@
 package com.webflux.webfluxlearning.sec07;
 
+import com.webflux.webfluxlearning.sec07.dto.Product;
+import org.junit.jupiter.api.Test;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+
+import java.time.Duration;
+
 /*
  * Copyright (c) 2026 Ramjee Prasad
  * Licensed under a custom Non-Commercial, Attribution, Share-Alike License.
@@ -18,5 +26,41 @@ package com.webflux.webfluxlearning.sec07;
  *   - Commercial use is strictly prohibited.
  *
  */
-public class Lec03PostTest {
+public class Lec03PostTest extends AbstractWebClient {
+
+    private final WebClient client = create();
+
+    @Test
+    public void postBodyValue() {
+
+        Product product = new Product(null, "IPhone", 1000);
+        this.client.post()
+                .uri("/lec03/product")
+                .bodyValue(product)
+                .retrieve()
+                .bodyToMono(Product.class)
+                .doOnNext(print())
+                .then()
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify();
+    }
+
+    @Test
+    public void postBody() {
+
+        Mono<Product> product = Mono.fromSupplier(() -> new Product(null, "IPhone", 1000))
+                .delayElement(Duration.ofSeconds(1));
+
+        this.client.post()
+                .uri("/lec03/product")
+                .body(product, Product.class)
+                .retrieve()
+                .bodyToMono(Product.class)
+                .doOnNext(print())
+                .then()
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify();
+    }
 }

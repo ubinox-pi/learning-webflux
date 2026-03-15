@@ -18,7 +18,7 @@ package com.webflux.webfluxlearning.sec07.dto;
  *   - Commercial use is strictly prohibited.
  *
  */
-public record Prodect(
+public record Product(
         Integer id,
         String description,
         Integer price

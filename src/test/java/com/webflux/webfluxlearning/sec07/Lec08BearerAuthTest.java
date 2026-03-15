@@ -23,14 +23,14 @@ import reactor.test.StepVerifier;
  *   - Commercial use is strictly prohibited.
  *
  */
-public class Lec07BasicAuthTest extends AbstractWebClient {
-    private final WebClient client = create(b -> b.defaultHeaders(h -> h.setBasicAuth("java", "secret")));
+public class Lec08BearerAuthTest extends AbstractWebClient {
+    private final WebClient client = create(b -> b.defaultHeaders(h -> h.setBearerAuth("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9")));
 
     @Test
-    public void basicAuth() {
+    public void bearerAuth() {
 
         this.client.get()
-                .uri("/lec07/product/{id}", 1)
+                .uri("/lec08/product/{id}", 1)
                 .retrieve()
                 .bodyToFlux(Product.class)
                 .doOnNext(print())

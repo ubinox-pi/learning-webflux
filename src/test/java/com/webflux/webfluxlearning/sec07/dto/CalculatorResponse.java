@@ -18,5 +18,10 @@ package com.webflux.webfluxlearning.sec07.dto;
  *   - Commercial use is strictly prohibited.
  *
  */
-public class CalculatorResponse {
+public record CalculatorResponse(
+        Integer first,
+        Integer second,
+        String operation,
+        Integer result
+) {
 }

@@ -1,5 +1,12 @@
 package com.webflux.webfluxlearning.sec07;
 
+import com.webflux.webfluxlearning.sec07.dto.Product;
+import org.junit.jupiter.api.Test;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.test.StepVerifier;
+
+import java.util.Map;
+
 /*
  * Copyright (c) 2026 Ramjee Prasad
  * Licensed under a custom Non-Commercial, Attribution, Share-Alike License.
@@ -18,5 +25,59 @@ package com.webflux.webfluxlearning.sec07;
  *   - Commercial use is strictly prohibited.
  *
  */
-public class Lec04HeaderTest {
+public class Lec04HeaderTest extends AbstractWebClient {
+
+    private final WebClient client = create(header -> header.defaultHeader("caller-id", "webflux-learning"));
+
+    @Test
+    public void defaultHeader() {
+
+        this.client.get()
+                .uri("/lec04/product/{id}", 1)
+                .retrieve()
+                .bodyToFlux(Product.class)
+                .doOnNext(print())
+                .then()
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify();
+
+    }
+
+    @Test
+    public void overrideHeader() {
+
+        this.client.get()
+                .uri("/lec04/product/{id}", 1)
+                .header("caller-id", "webflux-learning-override")
+                .retrieve()
+                .bodyToFlux(Product.class)
+                .doOnNext(print())
+                .then()
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify();
+
+    }
+
+    @Test
+    public void headersWithMap() {
+
+        Map<String, String> headers = Map.of(
+                "caller-id", "webflux-learning-override",
+                "some-key", "some-value"
+        );
+
+        this.client.get()
+                .uri("/lec04/product/{id}", 1)
+                .headers(h -> h.setAll(headers))
+                .retrieve()
+                .bodyToFlux(Product.class)
+                .doOnNext(print())
+                .then()
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify();
+
+    }
 }

@@ -1,5 +1,12 @@
 package com.webflux.webfluxlearning.sec07;
 
+import com.webflux.webfluxlearning.sec07.dto.Product;
+import org.junit.jupiter.api.Test;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.test.StepVerifier;
+
+import java.time.Duration;
+
 /*
  * Copyright (c) 2026 Ramjee Prasad
  * Licensed under a custom Non-Commercial, Attribution, Share-Alike License.
@@ -18,5 +25,21 @@ package com.webflux.webfluxlearning.sec07;
  *   - Commercial use is strictly prohibited.
  *
  */
-public class Lec02FluxTest {
+public class Lec02FluxTest extends AbstractWebClient {
+    private final WebClient client = create();
+
+    @Test
+    public void streamingResponse() {
+        this.client.get()
+                .uri("/lec02/product/stream")
+                .retrieve()
+                .bodyToFlux(Product.class)
+                .take(Duration.ofSeconds(3))
+                .doOnNext(print())
+                .then()
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify();
+
+    }
 }

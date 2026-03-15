@@ -1,5 +1,11 @@
 package com.webflux.webfluxlearning.sec07;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClient;
+
+import java.util.function.Consumer;
+
 /*
  * Copyright (c) 2026 Ramjee Prasad
  * Licensed under a custom Non-Commercial, Attribution, Share-Alike License.
@@ -18,5 +24,28 @@ package com.webflux.webfluxlearning.sec07;
  *   - Commercial use is strictly prohibited.
  *
  */
-public class AbstractWebClient {
+
+public abstract class AbstractWebClient {
+
+    private static final Logger log = LoggerFactory.getLogger(AbstractWebClient.class);
+
+    protected <T> Consumer<T> print() {
+        return item -> log.info("received: {}", item);
+    }
+
+    protected WebClient create(Consumer<WebClient.Builder> consumer) {
+        WebClient.Builder builder = WebClient.builder()
+                .baseUrl("http://localhost:8080/demo02");
+
+        consumer.accept(builder);
+
+        return builder.build();
+    }
+
+    protected WebClient create() {
+        return create(_ -> {
+        });
+    }
+
+
 }
